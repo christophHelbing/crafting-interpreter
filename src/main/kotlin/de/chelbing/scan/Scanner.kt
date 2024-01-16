@@ -52,12 +52,54 @@ class Scanner(private val source: String) {
                     addToken(TokenType.SLASH)
                 }
             }
+
             ' ', '\r', '\t' -> Unit
             '\n' -> line++
             '"' -> string()
-            else -> LoxInterpreter.error(line, "Unexpected character.")
+            else -> {
+                if (isDigit(c)) {
+                    number()
+                } else if (isAlpha(c)) {
+                    identifier()
+                } else {
+                    LoxInterpreter.error(line, "Unexpected character.")
+                }
+            }
         }
     }
+
+    private fun identifier() {
+        while (isAlphaNumeric(peek())) advance()
+
+        val text = source.substring(start, current)
+        val type = keywords.getOrDefault(text, TokenType.IDENTIFIER)
+        addToken(type)
+    }
+
+    private fun isAlpha(c: Char): Boolean =
+        (c in 'a'..'z') || (c in 'A'..'Z') || (c == '_')
+
+
+    private fun isAlphaNumeric(c: Char): Boolean = isAlpha(c) || isDigit(c)
+
+    private fun number() {
+        while (isDigit(peek())) advance()
+
+        // Look for a fractional part.
+        if (peek() == '.' && isDigit(peekNext())) {
+            // Consume the "."
+            advance()
+
+            while (isDigit(peek())) advance()
+        }
+
+        addToken(
+            TokenType.NUMBER,
+            source.substring(start, current).toDouble()
+        )
+    }
+
+    private fun isDigit(c: Char): Boolean = c in '0'..'9'
 
     private fun string() {
         while (peek() != '"' && !isAtEnd()) {
@@ -89,6 +131,11 @@ class Scanner(private val source: String) {
     private fun peek(): Char {
         if (isAtEnd()) return '\u0000'
         return source[current]
+    }
+
+    private fun peekNext(): Char {
+        if (current + 1 >= source.length) return '\u0000'
+        return source[current + 1]
     }
 
     private fun advance() = source[current++]

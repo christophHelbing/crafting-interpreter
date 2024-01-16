@@ -3,8 +3,8 @@ package scanner
 import de.chelbing.scan.Scanner
 import de.chelbing.scan.Token
 import de.chelbing.scan.TokenType
-import org.junit.jupiter.api.Test
 import kotlin.test.assertContentEquals
+import org.junit.jupiter.api.Test
 
 class ScannerTest {
     @Test
@@ -80,6 +80,94 @@ class ScannerTest {
         )
 
         val loxString = "\"TestString\""
+
+        val tokens = Scanner(loxString).scanTokens()
+
+        assertContentEquals(expectedTokens, tokens, "The scanned list of tokens did not match the expected list")
+    }
+
+    @Test
+    fun `Number without decimal place will be interpreted as Number token and double type`() {
+        val expectedTokens = listOf(
+            Token(TokenType.NUMBER, "123", 123.0, 1),
+            Token(TokenType.EOF, "", Unit, 1),
+        )
+
+        val loxString = "123"
+
+        val tokens = Scanner(loxString).scanTokens()
+
+        assertContentEquals(expectedTokens, tokens, "The scanned list of tokens did not match the expected list")
+    }
+
+    @Test
+    fun `Number with decimal place will be interpreted as Number token and double type`() {
+        val expectedTokens = listOf(
+            Token(TokenType.NUMBER, "123.456", 123.456, 1),
+            Token(TokenType.EOF, "", Unit, 1),
+        )
+
+        val loxString = "123.456"
+
+        val tokens = Scanner(loxString).scanTokens()
+
+        assertContentEquals(expectedTokens, tokens, "The scanned list of tokens did not match the expected list")
+    }
+
+    @Test
+    fun `keywords will be successfully parsed and no identifier is in the list`() {
+        val expectedTokens = listOf(
+            Token(TokenType.AND, "and", Unit, 1),
+            Token(TokenType.CLASS, "class", Unit, 1),
+            Token(TokenType.ELSE, "else", Unit, 1),
+            Token(TokenType.FALSE, "false", Unit, 1),
+            Token(TokenType.FOR, "for", Unit, 1),
+            Token(TokenType.FUN, "fun", Unit, 1),
+            Token(TokenType.IF, "if", Unit, 1),
+            Token(TokenType.NIL, "nil", Unit, 1),
+            Token(TokenType.OR, "or", Unit, 1),
+            Token(TokenType.PRINT, "print", Unit, 1),
+            Token(TokenType.RETURN, "return", Unit, 1),
+            Token(TokenType.SUPER, "super", Unit, 1),
+            Token(TokenType.THIS, "this", Unit, 1),
+            Token(TokenType.TRUE, "true", Unit, 1),
+            Token(TokenType.VAR, "var", Unit, 1),
+            Token(TokenType.WHILE, "while", Unit, 1),
+            Token(TokenType.EOF, "", Unit, 1),
+        )
+
+        val loxString = "and class else false for fun if nil or print return super this true var while"
+
+        val tokens = Scanner(loxString).scanTokens()
+
+        assertContentEquals(expectedTokens, tokens, "The scanned list of tokens did not match the expected list")
+    }
+
+
+    @Test
+    fun `keywords will be successfully parsed with an identifier in the list`() {
+        val expectedTokens = listOf(
+            Token(TokenType.AND, "and", Unit, 1),
+            Token(TokenType.CLASS, "class", Unit, 1),
+            Token(TokenType.ELSE, "else", Unit, 1),
+            Token(TokenType.FALSE, "false", Unit, 1),
+            Token(TokenType.FOR, "for", Unit, 1),
+            Token(TokenType.FUN, "fun", Unit, 1),
+            Token(TokenType.IF, "if", Unit, 1),
+            Token(TokenType.NIL, "nil", Unit, 1),
+            Token(TokenType.IDENTIFIER, "userId", Unit, 1),
+            Token(TokenType.OR, "or", Unit, 1),
+            Token(TokenType.PRINT, "print", Unit, 1),
+            Token(TokenType.RETURN, "return", Unit, 1),
+            Token(TokenType.SUPER, "super", Unit, 1),
+            Token(TokenType.THIS, "this", Unit, 1),
+            Token(TokenType.TRUE, "true", Unit, 1),
+            Token(TokenType.VAR, "var", Unit, 1),
+            Token(TokenType.WHILE, "while", Unit, 1),
+            Token(TokenType.EOF, "", Unit, 1),
+        )
+
+        val loxString = "and class else false for fun if nil userId or print return super this true var while"
 
         val tokens = Scanner(loxString).scanTokens()
 
